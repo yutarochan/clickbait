@@ -23,3 +23,10 @@ This is just a rough estimate:
 | 9/30 - 10/2 | Build Ensemble Models                                                                   |
 | 10/4        | All modeling should be done at this point.                                              |
 | 10/4 - 10/8 | Complete paper write up.                                                                |
+
+## Model Score Reporting Workflow
+To ensure that we keep our experimentation methodology consistent across all models
+we build, please follow these steps so that it will be easier for us when we write
+the paper.
+
+**TODO:** Fill in instructions on how to build model, document, and report score.
