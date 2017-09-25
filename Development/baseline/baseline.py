@@ -4,12 +4,15 @@ Simple baseline model based on example features from the instruction sets
 
 Author: Yuya Jeremy Ong (yjo5006@psu.edu)
 '''
+
+### TODO: Place score computation module!!!
+
 from __future__ import print_function
 import sys
 import string
 import numpy as np
 from nltk import word_tokenize
-from sklearn.cross_validation import KFold
+from sklearn.model_selection import KFold
 from sklearn.naive_bayes import GaussianNB
 from sklearn.metrics import confusion_matrix, f1_score, classification_report
 
@@ -58,9 +61,9 @@ Y = np.array(map(lambda x: [0] if x['truthClass'] == 'no-clickbait' else [1], tr
 
 ''' CV Model Training '''
 # K-Fold and Score Tracking
-kf = KFold(n=len(X), n_folds=K_FOLD, shuffle=SHUFFLE_FOLDS)
+kf = KFold(n_splits=K_FOLD, shuffle=SHUFFLE_FOLDS)
 
-for i, (train_idx, test_idx) in enumerate(kf):
+for i, (train_idx, test_idx) in enumerate(kf.split(X)):
     print('\n[K = ' + str(i+1) + ']')
     # Train Model & Generate Predictions
     gnb = GaussianNB()
@@ -69,8 +72,8 @@ for i, (train_idx, test_idx) in enumerate(kf):
     print(confusion_matrix(Y[test_idx], y_pred))
 
     # confusion += confusion_matrix(Y[test_idx], y_pred)
-    score = f1_score(Y[test_idx], y_pred, pos_label=1)
-    scores.append(score)
+    # score = f1_score(Y[test_idx], y_pred, pos_label=1)
+    # scores.append(score)
 
     '''
     # Compute ROC curve and area the curve

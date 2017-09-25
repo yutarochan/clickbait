@@ -14,7 +14,6 @@ the project. The features that this model utilizes are the following:
 
 ## Preprocessing
 * Utilizes standard NTLK library for tokenization process.
-* Feature vectors are normalized prior to training the model.
 
 ## Model Architecture
 Gaussian Naive Bayes (from Scikit-Learn)
