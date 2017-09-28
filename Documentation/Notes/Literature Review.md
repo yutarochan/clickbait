@@ -45,3 +45,11 @@ classification results. Use p=10, n=20 (try various scores and check F-Score).
     * N-Gram Features grows linearly to the size of the dataset.
     * Prune Features by APRIORI-like algorithm.
 * SVM + RBF Kernel Performs the Best
+
+#### We used Neural Networks to Detect CLickbaits: You won't believe what happened next
+* Use of Distributed Word Embeddings and Character Embeddings
+* Model:
+    * Embedding Layer: Transforms each word into embedded features.
+    * Hidden Layer: Consists of Bi-Directional RNN.
+    * Output Layer: Sigmoid output node that is used as the classifier 
+* BiLSTM(CE+WE): 0.98 AUC, 0.98 PRE, 0.98 REC (Best Results)
