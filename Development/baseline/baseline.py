@@ -19,6 +19,7 @@ from sklearn.metrics import confusion_matrix, f1_score, classification_report
 sys.path.append('..')
 from text2num import text2num
 from util.load_data import JSONData
+from util.scores import ScoreReport
 
 import warnings
 warnings.filterwarnings("ignore")
@@ -28,7 +29,9 @@ DATA_ROOT = '../../Data/dataset/'       # Root Folder of where Dataset Resides
 MODEL_ROOT = '../../Models/dataset/'    # Root Folder of where Model Resides
 K_FOLD = 10
 SHUFFLE_FOLDS = True
-np.random.seed(9892)                # Seed Parameter for PRNG
+np.random.seed(9892)                    # Seed Parameter for PRNG
+
+report = ScoreReport('Baseline Model')  # Automated Score Reporting Utility
 
 ''' Import Data '''
 # Load Dataset
@@ -63,50 +66,25 @@ Y = np.array(map(lambda x: [0] if x['truthClass'] == 'no-clickbait' else [1], tr
 # K-Fold and Score Tracking
 kf = KFold(n_splits=K_FOLD, shuffle=SHUFFLE_FOLDS)
 
+print('Training Model...')
 for i, (train_idx, test_idx) in enumerate(kf.split(X)):
     print('\n[K = ' + str(i+1) + ']')
-    # Train Model & Generate Predictions
+    # Train Model
     gnb = GaussianNB()
-    y_pred = gnb.fit(X[train_idx], Y[train_idx]).predict(X[test_idx])
+    gnb.fit(X[train_idx], Y[train_idx])
 
-    print(confusion_matrix(Y[test_idx], y_pred))
+    # Generate Predictions & Confidence Estimates
+    y_pred = gnb.predict(X[test_idx])
+    y_prob = gnb.predict_proba(X[test_idx])
 
-    # confusion += confusion_matrix(Y[test_idx], y_pred)
-    # score = f1_score(Y[test_idx], y_pred, pos_label=1)
-    # scores.append(score)
+    # Append to Report
+    y_prob = map(lambda x: x[1][x[0]], zip(y_pred, y_prob))
+    report.append_result(Y[test_idx].reshape(y_pred.shape), y_pred, y_prob)
 
-    '''
-    # Compute ROC curve and area the curve
-    prd = gnb.predict_proba(X[test_idx])[:,1]
-    fpr, tpr, thresholds = roc_curve(X[test_idx], prd)
-    mean_tpr += interp(mean_fpr, fpr, tpr)
-    mean_tpr[0] = 0.0
-    roc_auc = auc(fpr, tpr)
+# Generate Prediction Reports
+report.generate_report()
 
-    if roc_auc is not None: plt.plot(fpr, tpr, lw=1, label='ROC fold %d (area = %0.2f)' % (i, roc_auc))
-    '''
-
-    print(classification_report(Y[test_idx], y_pred))
-    i += 1
-
-''' Compute Average Scores
-mean_tpr /= 10
-mean_tpr[-1] = 1.0
-mean_auc = auc(mean_fpr, mean_tpr)
-plt.plot(mean_fpr, mean_tpr, 'k--', label='Mean ROC (area = %0.2f)' % mean_auc, lw=2)
-
-# Export mean ROC curve values for aggregate ROC analysis.
-mean_roc = np.vstack((mean_fpr.T, mean_tpr.T)).T
-mroc_df = pd.DataFrame(data=mean_roc.astype(float))
-mroc_df.to_csv('bow_10fold_roc.csv', sep=',', header=False, float_format='%.2f', index=False)
-'''
-
-''' Accuracy Reporting '''
-print('Average F1 Score: ' + str(sum(scores)/len(scores)))
-# print('Confusion matrix: ')
-# print(confusion)
-
-''' Full Model Training... '''
+''' Full Model Training...
 gnb = GaussianNB()
 gnb.fit(X, Y)
 
@@ -125,3 +103,4 @@ predict('You won\'t believe how these 9 shocking clickbaits work!')
 predict('You\'ll Never Look at Barbie Dolls The Same Once You See These Paintings')
 predict('Well If It Isn\'t Coupons, I Can\'t Even IMAGINE What It Is!')
 predict('Trump vows to back winner of Alabama GOP Senate runoff')
+'''

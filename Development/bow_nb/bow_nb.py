@@ -17,6 +17,7 @@ from sklearn.metrics import confusion_matrix, f1_score, classification_report
 
 sys.path.append('..')
 from util.load_data import JSONData
+from util.scores import ScoreReport
 
 import warnings
 warnings.filterwarnings("ignore")
@@ -30,7 +31,9 @@ np.random.seed(9892)                    # Seed Parameter for PRNG
 
 # Model Hyper-Parameters
 # TODO: Perform Hyperparameter Selection for Best Model - Get Data for Each Dimensional Range
-MAX_FEATURES = 100                      # Dimension of Feature Vector
+MAX_FEATURES = 10                       # Dimension of Feature Vector
+
+report = ScoreReport('Bag-of-Words '+str(MAX_FEATURES)+' DIM + Naive Bayes')  # Automated Score Reporting Utility
 
 ''' Import Data '''
 # Load Dataset
@@ -63,9 +66,17 @@ kf = KFold(n_splits=K_FOLD, shuffle=SHUFFLE_FOLDS)
 
 for i, (train_idx, test_idx) in enumerate(kf.split(X)):
     print('\n[K = ' + str(i+1) + ']')
-    # Train Model & Generate Predictions
+    # Train Model
     gnb = GaussianNB()
-    y_pred = gnb.fit(X[train_idx], Y[train_idx]).predict(X[test_idx])
+    gnb.fit(X[train_idx], Y[train_idx])
 
-    print(classification_report(Y[test_idx], y_pred))
-    i += 1
+    # Generate Predictions & Confidence Estimates
+    y_pred = gnb.predict(X[test_idx])
+    y_prob = gnb.predict_proba(X[test_idx])
+
+    # Append to Report
+    y_prob = map(lambda x: x[1][x[0]], zip(y_pred, y_prob))
+    report.append_result(Y[test_idx].reshape(y_pred.shape), y_pred, y_prob)
+
+# Generate Prediction Reports
+report.generate_report()
