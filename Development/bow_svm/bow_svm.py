@@ -77,3 +77,6 @@ for i, (train_idx, test_idx) in enumerate(kf.split(X)):
     # Append to Report
     y_prob = map(lambda x: x[1][x[0]], zip(y_pred, y_prob))
     report.append_result(Y[test_idx].reshape(y_pred.shape), y_pred, y_prob)
+
+# Generate Prediction Reports
+report.generate_report()

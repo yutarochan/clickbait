@@ -70,7 +70,7 @@ class ScoreReport:
 
         output.write('### K-Fold Classification Report\n')
         output.write('| K | Accuracy | Precision | Recall | F-Measure | AUC | Kappa |\n')
-        output.write('|-|\n')
+        output.write('| --- | --- | --- | --- | --- | --- | --- |\n')
         for i in range(len(self.acc_list)):
             output.write('| ' + str(i+1) + ' | '
                         + str(self.acc_list[i]) + ' | '
@@ -83,13 +83,13 @@ class ScoreReport:
         output.write('\n### Average Confusion Matrix\n')
         conf = np.true_divide(np.array(self.avg_conf), len(self.acc_list))
         output.write('| | Pred POS | Pred NEG |\n')
-        output.write('|-|\n')
+        output.write('| --- | --- | --- |\n')
         output.write('| **True POS** | ' + str(conf[1, 1])  + ' | '+ str(conf[1, 0]) + ' |\n')
         output.write('| **True NEG** | ' + str(conf[0, 1])  + ' | '+ str(conf[0, 0]) + ' |\n')
 
         output.write('\n### Average Model Performance Metrics\n')
         output.write('| ACC | PRE | REC | F1 | AUC | KAPP |\n')
-        output.write('|-|\n')
+        output.write('| --- | --- | --- | --- | --- | --- |\n')
         output.write('| ' + str(np.mean(self.acc_list)) +
                     ' | ' + str(np.mean(self.pre_list)) +
                     ' | ' + str(np.mean(self.rec_list)) +
