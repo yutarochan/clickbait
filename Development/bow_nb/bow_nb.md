@@ -1,15 +1,34 @@
-# Bag-of-Words + Random Forest Model
+# Bag-of-Words + Naive Bayes Model
 
 ## Description
+Model based on feature extraction of headlines using Bag-of-Words vectorizer, trained with naive bayes algorithm.
 
 ## Preprocessing
 * Utilizes standard NTLK library for tokenization process.
 
 ## Model Architecture
-Random Forest Model (from Scikit-Learn)
+Bag of Words Vectorizer (from Scikit-Learn):
+* `MAX_FEATURES`: The number of dimension for the word embedding model. [10, 5000]
 
-## Training Process
+Naive Bayes (from Scikit-Learn)
 
-## Results
+## Training & Evaluation Process
+* Employed 10-Fold Cross Validation for Model Evaluation
 
-## References
+## Hyperparameter Evaluation
+We evaluated our model based on evaluating the dimensionality of the BoW Feature.
+
+| DIM | ACC | PRE | REC | F1 | AUC | KAPP |
+| --- | --- | --- | --- | --- | --- | --- |
+|  10 | 0.744268093685 | 0.123781676413 | 0.00356985609094 | 0.00675136028263 | 0.498772910091 | -0.00360145086834 |
+|  25 | 0.665843660524 | 0.26336778149 | 0.167802359462 | 0.187977639159 | 0.501720788077 | 0.0062794730059 |
+|  50 | 0.479897209928 | 0.252782670657 | 0.541163891803 | 0.335870922418 | 0.500666753485 | 0.00105450680911 |
+| 100 | 0.495198462515 | 0.25275024267 | 0.512077817812 | 0.331494160506 | 0.501346973169 | 0.00191675115145 |
+| 150 | 0.413060121165 | 0.251677870416 | 0.672363052779 | 0.365920088387 | 0.499099155709 | -0.00115676045433 |
+| 200 | 0.424095711895 | 0.25257870853 | 0.654698047414 | 0.363933230186 | 0.500681841032 | 0.000904288106322 |
+| 300 | 0.430750937322 | 0.253800563851 | 0.647234851926 | 0.363619296466 | 0.502777226769 | 0.00358471468244 |
+| 400 | 0.408966951048 | 0.255568595277 | 0.701283782121 | 0.373977212484 | 0.506139352906 | 0.00786738663522 |
+| 500 | 0.424268138958 | 0.256237837144 | 0.671772088548 | 0.370113836623 | 0.506575051115 | 0.00903865582083 |
+| 600 | 0.42688390795 | 0.254956385673 | 0.661065194346 | 0.367093375043 | 0.504778412856 | 0.00632623021409 |
+| 800 | 0.449122892118 | 0.255224202044 | 0.618092205591 | 0.360598373579 | 0.5053444164 | 0.00695349265946 |
+| 1000 | 0.460953451807 | 0.254770574685 | 0.591969067702 | 0.355645855093 | 0.504689836673 | 0.00590069197305 |

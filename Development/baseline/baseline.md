@@ -18,8 +18,5 @@ the project. The features that this model utilizes are the following:
 ## Model Architecture
 Gaussian Naive Bayes (from Scikit-Learn)
 
-## Training Process
-
-## Results
-
-## References
+## Training & Evaluation Process
+* Employed 10-Fold Cross Validation for Model Evaluation

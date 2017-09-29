@@ -2,9 +2,6 @@
 Bag-of-Word + Logistic Model
 Author: Yuya Jeremy Ong (yjo5006@psu.edu)
 '''
-
-### TODO: Place score computation module!!! and perform complete analysis!
-
 from __future__ import print_function
 import sys
 import string
@@ -30,8 +27,7 @@ SHUFFLE_FOLDS = True
 np.random.seed(9892)                    # Seed Parameter for PRNG
 
 # Model Hyper-Parameters
-# TODO: Perform Hyperparameter Selection for Best Model - Get Data for Each Dimensional Range
-MAX_FEATURES = 10                       # Dimension of Feature Vector
+MAX_FEATURES = 800                      # Dimension of Feature Vector
 
 report = ScoreReport('Bag-of-Words '+str(MAX_FEATURES)+' DIM + Naive Bayes')  # Automated Score Reporting Utility
 

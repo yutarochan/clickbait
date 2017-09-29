@@ -1,10 +1,7 @@
 '''
-Bag-of-Word + Logistic Model
+Bag-of-Word + Support Vector Machine
 Author: Yuya Jeremy Ong (yjo5006@psu.edu)
 '''
-
-### TODO: Place score computation module!!! and perform complete analysis!
-
 from __future__ import print_function
 import sys
 import string
@@ -30,10 +27,9 @@ SHUFFLE_FOLDS = True
 np.random.seed(9892)                    # Seed Parameter for PRNG
 
 # Model Hyper-Parameters
-# TODO: Perform Hyperparameter Selection for Best Model - Get Data for Each Dimensional Range
 MAX_FEATURES = 100                      # Dimension of Feature Vector
 
-report = ScoreReport('Bag-of-Words '+str(MAX_FEATURES)+' DIM + SVM (RBF Kernel)')  # Automated Score Reporting Utility
+report = ScoreReport('Bag-of-Words '+str(MAX_FEATURES)+' DIM + SVM-LINEAR')  # Automated Score Reporting Utility
 
 ''' Import Data '''
 # Load Dataset
@@ -67,7 +63,7 @@ kf = KFold(n_splits=K_FOLD, shuffle=SHUFFLE_FOLDS)
 for i, (train_idx, test_idx) in enumerate(kf.split(X)):
     print('\n[K = ' + str(i+1) + ']')
     # Train Model & Generate Predictions
-    clf = svm.SVC(class_weight='balanced', kernel='rbf', probability=True)
+    clf = svm.SVC(class_weight='balanced', kernel='linear', probability=True)
     clf.fit(X[train_idx], Y[train_idx])
 
     # Generate Predictions & Confidence Estimates

@@ -2,9 +2,6 @@
 Bag-of-Word + Logistic Model
 Author: Yuya Jeremy Ong (yjo5006@psu.edu)
 '''
-
-### TODO: Place score computation module!!! and perform complete analysis!
-
 from __future__ import print_function
 import sys
 import string
@@ -30,8 +27,7 @@ SHUFFLE_FOLDS = True
 np.random.seed(9892)                    # Seed Parameter for PRNG
 
 # Model Hyper-Parameters
-# TODO: Perform Hyperparameter Selection for Best Model - Get Data for Each Dimensional Range
-MAX_FEATURES = 200                      # Dimension of Feature Vector
+MAX_FEATURES = 500                      # Dimension of Feature Vector
 
 report = ScoreReport('Bag-of-Words '+str(MAX_FEATURES)+' DIM + Logistic')  # Automated Score Reporting Utility
 
@@ -67,7 +63,7 @@ kf = KFold(n_splits=K_FOLD, shuffle=SHUFFLE_FOLDS)
 print('Training Model...')
 for i, (train_idx, test_idx) in enumerate(kf.split(X)):
     print('\n[K = ' + str(i+1) + ']')
-    # Train Model & Generate Predictions
+    # Train Model
     logistic = LogisticRegression(class_weight='balanced')
     logistic.fit(X[train_idx], Y[train_idx])
 
