@@ -38,7 +38,6 @@ train_Y = data_load.load_train_Y()
 def preprocess(text):
     text = word_tokenize(text.lower())                                      # Tokenize & Normalize Text
     text = filter(lambda x: x not in string.punctuation, text)              # Remove Punctuation
-
     return text
     
 # Finalize Feature and Target Vectors
