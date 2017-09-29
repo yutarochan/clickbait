@@ -4,9 +4,6 @@ Simple baseline model based on example features from the instruction sets
 
 Author: Yuya Jeremy Ong (yjo5006@psu.edu)
 '''
-
-### TODO: Place score computation module!!!
-
 from __future__ import print_function
 import sys
 import string
