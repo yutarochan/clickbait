@@ -57,7 +57,7 @@ def preprocess(text):
 X = np.array(map(lambda x: preprocess(x['targetTitle']), train_X))
 Y = np.array(map(lambda x: [0] if x['truthClass'] == 'no-clickbait' else [1], train_Y))
 
-tk = keras.preprocessing.text.Tokenizer(nb_words=max_features, lower=True, split=" ")
+tk = keras.preprocessing.text.Tokenizer(nb_words=MAX_WORDS, lower=True, split=" ")
 tk.fit_on_texts(X)
 X = tk.texts_to_sequences(X)
 
