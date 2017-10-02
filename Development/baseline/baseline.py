@@ -9,9 +9,9 @@ import sys
 import string
 import numpy as np
 from nltk import word_tokenize
-from sklearn.model_selection import KFold
+from imblearn.over_sampling import SMOTE
 from sklearn.naive_bayes import GaussianNB
-from sklearn.metrics import confusion_matrix, f1_score, classification_report
+from sklearn.model_selection import KFold, StratifiedKFold
 
 sys.path.append('..')
 from text2num import text2num
@@ -28,7 +28,7 @@ K_FOLD = 10
 SHUFFLE_FOLDS = True
 np.random.seed(9892)                    # Seed Parameter for PRNG
 
-report = ScoreReport('Baseline Model')  # Automated Score Reporting Utility
+report = ScoreReport('Baseline Model + StratifiedKFold')  # Automated Score Reporting Utility
 
 ''' Import Data '''
 # Load Dataset
@@ -58,14 +58,20 @@ def preprocess(text):
 # Finalize Feature and Target Vectors
 X = np.array(map(lambda x: preprocess(x['targetTitle']), train_X))
 Y = np.array(map(lambda x: [0] if x['truthClass'] == 'no-clickbait' else [1], train_Y))
+Y_ = np.array(map(lambda x: 0 if x['truthClass'] == 'no-clickbait' else 1, train_Y))
 
 ''' CV Model Training '''
 # K-Fold and Score Tracking
-kf = KFold(n_splits=K_FOLD, shuffle=SHUFFLE_FOLDS)
+kf = StratifiedKFold(n_splits=K_FOLD, shuffle=SHUFFLE_FOLDS)
 
 print('Training Model...')
-for i, (train_idx, test_idx) in enumerate(kf.split(X)):
+for i, (train_idx, test_idx) in enumerate(kf.split(X, Y_)):
     print('\n[K = ' + str(i+1) + ']')
+    ''' SMOTE - Generate Synthetic Data '''
+    # sm = SMOTE(kind='regular')
+    # X_resampled = []
+    # X_res, Y_res = sm.fit_sample(X[train_idx], Y[train_idx])
+
     # Train Model
     gnb = GaussianNB()
     gnb.fit(X[train_idx], Y[train_idx])
