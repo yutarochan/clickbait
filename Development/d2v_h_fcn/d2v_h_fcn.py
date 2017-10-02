@@ -51,11 +51,15 @@ train_Y = data_load.load_train_Y()
 def preprocess(text):
     text = word_tokenize(text.lower())                                      # Tokenize & Normalize Text
     text = filter(lambda x: x not in string.punctuation, text)              # Remove Punctuation
-    return text
+    return ' '.join(text)
 
 # Finalize Feature and Target Vectors
 X = np.array(map(lambda x: preprocess(x['targetTitle']), train_X))
 Y = np.array(map(lambda x: [0] if x['truthClass'] == 'no-clickbait' else [1], train_Y))
+
+tk = keras.preprocessing.text.Tokenizer(nb_words=max_features, lower=True, split=" ")
+tk.fit_on_texts(X)
+X = tk.texts_to_sequences(X)
 
 ''' CV Model Training '''
 # K-Fold and Score Tracking
