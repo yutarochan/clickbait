@@ -7,9 +7,9 @@ Author: Yuya Jeremy Ong (yjo5006@psu.edu)
 from __future__ import print_function
 import os
 import numpy as np
-import seaborn as sns
+# import seaborn as sns
 from scipy import interp
-import matplotlib.pyplot as plt
+# import matplotlib.pyplot as plt
 from sklearn import metrics as met
 
 class ScoreReport:
@@ -39,7 +39,7 @@ class ScoreReport:
         self.model_name = model_name    # Model Name
 
     def append_result(self, y_true, y_pred, y_prob):
-        fpr, tpr, thresholds = met.roc_curve(y_true, y_prob)
+        fpr, tpr, thresholds = met.roc_curve(y_true, y_prob, pos_label=1)
 
         self.tpr_list.append(tpr)
         self.fpr_list.append(fpr)
@@ -104,19 +104,20 @@ class ScoreReport:
         # Plot Each K-Fold & Output CSV for Each Fold
         for i in range(len(self.acc_list)):
             self.output_roc_csv(i+1, self.tpr_list[i], self.fpr_list[i])
-            plt.plot(self.fpr_list[i], self.tpr_list[i], lw=1, label='ROC Fold %d (area = %0.2f)' % (i+1, self.auc_score[i]))
-
+            # plt.plot(self.fpr_list[i], self.tpr_list[i], lw=1, label='ROC Fold %d (area = %0.2f)' % (i+1, self.auc_score[i]))
+        
         # Plot Random AUC Line
-        plt.plot([0, 1], [0, 1], '--', color=(0.6, 0.6, 0.6), label='Random')
+        # plt.plot([0, 1], [0, 1], '--', color=(0.6, 0.6, 0.6), label='Random')
 
         # Plot Mean AUC
         self.mean_tpr /= len(self.acc_list)
         self.mean_tpr[-1] = 1.0
         mean_auc = met.auc(self.mean_fpr, self.mean_tpr)
-        plt.plot(self.mean_fpr, self.mean_tpr, 'k--', label='Mean ROC (area = %0.2f)' % mean_auc, lw=2)
+        # plt.plot(self.mean_fpr, self.mean_tpr, 'k--', label='Mean ROC (area = %0.2f)' % mean_auc, lw=2)
         self.output_roc_csv(len(self.acc_list), self.mean_tpr, self.mean_fpr, True)
 
         # Plot Axis and Normalize Graph
+        '''
         plt.xlim([-0.05, 1.05])
         plt.ylim([-0.05, 1.05])
         plt.xlabel('False Positive Rate')
@@ -124,6 +125,7 @@ class ScoreReport:
         plt.title(self.model_name+' '+str(len(self.acc_list))+'-Fold ROC')
         plt.legend(loc="lower right")
         plt.savefig(self.output_dir + '/' + self.model_name.replace(' ', '_').lower() + '_auc-plot.png')
+        '''
 
     def output_roc_csv(self, k, tpr, fpr, average=False):
         if average:

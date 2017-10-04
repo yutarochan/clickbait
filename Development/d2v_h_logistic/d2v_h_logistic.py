@@ -40,7 +40,7 @@ np.random.seed(9892)                        # Seed Parameter for PRNG
 WORKERS = 8       # Total Worker Threads
 EPOCHS = 15       # Total Epoch Count
 PER_EPOCH = 15    # Per Epoch Count
-DIM = 50          # Total Dimension of the Word Embedding
+DIM = 400         # Total Dimension of the Word Embedding
 MIN_COUNT = 2     # Minimum Window Size Count
 
 report = ScoreReport('Doc2Vec '+str(DIM)+' Dimension - Headline + Logistic Function + SMOTE')  # Automated Score Reporting Utility

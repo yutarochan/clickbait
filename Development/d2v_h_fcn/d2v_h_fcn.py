@@ -6,20 +6,21 @@ from __future__ import print_function
 import sys
 import random
 import string
+import gensim
 import numpy as np
 from nltk import word_tokenize
 from operator import itemgetter
 from imblearn.over_sampling import SMOTE
 from sklearn.model_selection import KFold
 
-import numpy
+import keras
 from keras.models import Sequential
 from keras.layers import Dense, Flatten
-from keras.preprocessing import sequence
 from keras.layers.embeddings import Embedding
 from keras.layers.convolutional import Conv1D, MaxPooling1D
 
 sys.path.append('..')
+import text
 from util.load_data import JSONData
 from util.scores import ScoreReport
 
@@ -33,12 +34,18 @@ MODEL_ROOT = '../../Models/d2v_h_fcn/'      # Root Folder of where Model Resides
 # Model Hyperparameters
 K_FOLD = 10
 SHUFFLE_FOLDS = True
-MAX_WORDS = 50
+
+## Word Embedding Hyperparameter
+MIN_COUNT = 2     # Minimum Window Size Count
+EMB_EPOCH = 1
+EMB_PER_EPOCH = 1
+
+## FC Neural Network Hyperaparameter
 EPOCHS = 100
 BATCH_SIZE = 256
 np.random.seed(9892)                        # Seed Parameter for PRNG
 
-report = ScoreReport('Fully Connected Neural Network - MAX_DIM ' + str(MAX_WORDS) + ' ' + str(EPOCHS) + ' + EPOCHS ')  # Automated Score Reporting Utility
+report = ScoreReport('Fully Connected Neural Network - MAX_DIM ' + str(MAX_WORDS) + ' ' + str(EPOCHS) + ' + EPOCHS')  # Automated Score Reporting Utility
 
 ''' Import Data '''
 # Load Dataset
@@ -54,10 +61,10 @@ def preprocess(text):
     return ' '.join(text)
 
 # Finalize Feature and Target Vectors
-X = np.array(map(lambda x: preprocess(x['targetTitle']), train_X))
+X = map(lambda x: preprocess(x['targetTitle']), train_X)
 Y = np.array(map(lambda x: [0] if x['truthClass'] == 'no-clickbait' else [1], train_Y))
 
-tk = keras.preprocessing.text.Tokenizer(nb_words=MAX_WORDS, lower=True, split=" ")
+tk = text.Tokenizer(lower=True, split=" ")
 tk.fit_on_texts(X)
 X = tk.texts_to_sequences(X)
 
@@ -69,24 +76,40 @@ print('Training Model...')
 for i, (train_idx, test_idx) in enumerate(kf.split(X)):
     print('\n[K = ' + str(i+1) + ']')
 
-    # Pad Sequence for Embeddings
-    X_train = sequence.pad_sequences(X[train_idx], maxlen=MAX_WORDS)
+    ''' Generate Wrapper for Training Set '''
+    X_LD = map(lambda x: LabeledDocs(x[0], x[1], Y[x[1]][0]), zip(X[train_idx], range(len(X[train_idx]))))
+    X_data = DocList(docs=X_LD)
+
+    ''' Build Word Embedding Feature Vector '''
+    print('Training Word Embedding Model')
+    headline_model = gensim.models.doc2vec.Doc2Vec(size=DIM, min_count=MIN_COUNT, iter=PER_EPOCH, workers=WORKERS)
+    headline_model.build_vocab(X_data.toDocEmbArray())
+    tmp = X_data.toDocEmbArray()
+    for _ in range(EPOCHS):
+        random.shuffle(tmp)
+        headline_model.train(tmp, total_examples=headline_model.corpus_count, epochs=headline_model.iter)
+
+    # Convert Text to Word Embeddings
+    _X_train = map(lambda x: headline_model.docvecs[x.tag], X_data)
+    print(_X_train[0])
+    sys.exit()
 
     # Build Model
+    print('Train Fully Connected Model')
     model = Sequential()
-    model.add(Embedding(len(X_train), 32, input_length=MAX_WORDS))
-    model.add(Flatten())
+    # model.add(Embedding(TOP_WORDS, 32, input_length=MAX_WORDS))
+    # model.add(Flatten())
     model.add(Dense(150, activation='relu'))
     model.add(Dense(1, activation='sigmoid'))
     model.compile(loss='binary_crossentropy', optimizer='adam', metrics=['accuracy'])
     print(model.summary())
 
     # Train Model
-    model.fit(X_train, Y[train_idx], validation_data=(X[test_idx], Y[test_idx]), epochs=EPOCHS, batch_size=BATCH_SIZE, verbose=2)
+    model.fit(X_train, y_train, validation_data=(X_test, y_test), epochs=EPOCHS, batch_size=BATCH_SIZE, verbose=2)
 
     # Generate Predictions
-    y_pred = logistic.predict(_X_test)
-    y_prob = logistic.predict_proba(_X_test)
+    y_pred = logistic.predict(X_test)
+    y_prob = logistic.predict_proba(X_test)
 
     # Append to Report
     y_prob = map(lambda x: x[1][x[0]], zip(y_pred, y_prob))
