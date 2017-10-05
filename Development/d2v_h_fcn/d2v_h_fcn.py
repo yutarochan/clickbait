@@ -1,51 +1,54 @@
 '''
-Word Embedding + FC Neural Network Architecture
+Doc2Vec (Headline) + Logistic Function
 Author: Yuya Jeremy Ong (yjo5006@psu.edu)
 '''
 from __future__ import print_function
 import sys
 import random
-import string
 import gensim
+import string
+import logging
 import numpy as np
 from nltk import word_tokenize
 from operator import itemgetter
 from imblearn.over_sampling import SMOTE
+from sklearn.linear_model import LogisticRegression
 from sklearn.model_selection import KFold
 
-import keras
 from keras.models import Sequential
-from keras.layers import Dense, Flatten
-from keras.layers.embeddings import Embedding
-from keras.layers.convolutional import Conv1D, MaxPooling1D
+from keras.layers import Dense
 
 sys.path.append('..')
-import text
 from util.load_data import JSONData
 from util.scores import ScoreReport
+from doc2vec import LabeledDocs, DocList
 
 import warnings
 warnings.filterwarnings("ignore")
 
+# Logging Information for Gensim
+logging.basicConfig(format='%(asctime)s : %(levelname)s : %(message)s', level=logging.INFO)
+
 ''' Constants and Parameters '''
 DATA_ROOT = '../../Data/dataset/'           # Root Folder of where Dataset Resides
-MODEL_ROOT = '../../Models/d2v_h_fcn/'      # Root Folder of where Model Resides
+MODEL_ROOT = '../../Models/dataset/'        # Root Folder of where Model Resides
+MODEL_ROOT = '../../Models/'                # Root Folder of where Embedding Model Resides
 
 # Model Hyperparameters
 K_FOLD = 10
 SHUFFLE_FOLDS = True
-
-## Word Embedding Hyperparameter
-MIN_COUNT = 2     # Minimum Window Size Count
-EMB_EPOCH = 1
-EMB_PER_EPOCH = 1
-
-## FC Neural Network Hyperaparameter
-EPOCHS = 100
-BATCH_SIZE = 256
 np.random.seed(9892)                        # Seed Parameter for PRNG
 
-report = ScoreReport('Fully Connected Neural Network - MAX_DIM ' + str(MAX_WORDS) + ' ' + str(EPOCHS) + ' + EPOCHS')  # Automated Score Reporting Utility
+NN_EPOCH = 10
+
+# Document Embedding Hyperparameters
+WORKERS = 8       # Total Worker Threads
+EPOCHS = 15       # Total Epoch Count
+PER_EPOCH = 15    # Per Epoch Count
+DIM = 150         # Total Dimension of the Word Embedding
+MIN_COUNT = 2     # Minimum Window Size Count
+
+report = ScoreReport('Doc2Vec '+str(DIM)+' Dimension - Headline + Neural Network')  # Automated Score Reporting Utility
 
 ''' Import Data '''
 # Load Dataset
@@ -58,15 +61,11 @@ train_Y = data_load.load_train_Y()
 def preprocess(text):
     text = word_tokenize(text.lower())                                      # Tokenize & Normalize Text
     text = filter(lambda x: x not in string.punctuation, text)              # Remove Punctuation
-    return ' '.join(text)
+    return text
 
 # Finalize Feature and Target Vectors
-X = map(lambda x: preprocess(x['targetTitle']), train_X)
+X = np.array(map(lambda x: preprocess(x['targetTitle']), train_X))
 Y = np.array(map(lambda x: [0] if x['truthClass'] == 'no-clickbait' else [1], train_Y))
-
-tk = text.Tokenizer(lower=True, split=" ")
-tk.fit_on_texts(X)
-X = tk.texts_to_sequences(X)
 
 ''' CV Model Training '''
 # K-Fold and Score Tracking
@@ -82,38 +81,48 @@ for i, (train_idx, test_idx) in enumerate(kf.split(X)):
 
     ''' Build Word Embedding Feature Vector '''
     print('Training Word Embedding Model')
-    headline_model = gensim.models.doc2vec.Doc2Vec(size=DIM, min_count=MIN_COUNT, iter=PER_EPOCH, workers=WORKERS)
-    headline_model.build_vocab(X_data.toDocEmbArray())
+    emb_model = gensim.models.doc2vec.Doc2Vec(size=DIM, min_count=MIN_COUNT, iter=PER_EPOCH, workers=WORKERS)
+    emb_model.build_vocab(X_data.toDocEmbArray())
     tmp = X_data.toDocEmbArray()
     for _ in range(EPOCHS):
         random.shuffle(tmp)
-        headline_model.train(tmp, total_examples=headline_model.corpus_count, epochs=headline_model.iter)
+        emb_model.train(tmp, total_examples=emb_model.corpus_count, epochs=emb_model.iter)
+
+    # Persist Weights
+    # print('Persisting Weights')
+    emb_model.save(MODEL_ROOT+'d2v_h_fcn_'+str(EPOCHS)+'_'+str(PER_EPOCH)+'_DIM-'+str(DIM)+'_K-'+str(i+1))
 
     # Convert Text to Word Embeddings
-    _X_train = map(lambda x: headline_model.docvecs[x.tag], X_data)
-    print(_X_train[0])
-    sys.exit()
+    _X_train = np.array(map(lambda x: emb_model.docvecs[x.tag], X_data))
+    _X_test = np.array(map(lambda x: emb_model.infer_vector(x), X[test_idx]))
 
-    # Build Model
-    print('Train Fully Connected Model')
+    ''' SMOTE - Generate Synthetic Data '''
+    # sm = SMOTE(kind='regular')
+    # X_resampled = []
+    # X_res, Y_res = sm.fit_sample(np.array(_X_train), np.array(Y[train_idx]))
+
+    ''' Build Neural Network Model '''
     model = Sequential()
-    # model.add(Embedding(TOP_WORDS, 32, input_length=MAX_WORDS))
-    # model.add(Flatten())
-    model.add(Dense(150, activation='relu'))
+    
+    model.add(Dense(100, input_shape=(DIM, )))
+    model.add(Dense(25, activation='relu'))
     model.add(Dense(1, activation='sigmoid'))
-    model.compile(loss='binary_crossentropy', optimizer='adam', metrics=['accuracy'])
-    print(model.summary())
 
-    # Train Model
-    model.fit(X_train, y_train, validation_data=(X_test, y_test), epochs=EPOCHS, batch_size=BATCH_SIZE, verbose=2)
+    model.compile(optimizer='adam', loss='binary_crossentropy', metrics=['acc'])
+    model.summary()
 
-    # Generate Predictions
-    y_pred = logistic.predict(X_test)
-    y_prob = logistic.predict_proba(X_test)
+    model.fit(_X_train, Y[train_idx], epochs=NN_EPOCH, validation_data=(_X_test, Y[test_idx]), verbose=1)
 
+    # Infer Feature Vectors Based on Trained Model
+    # _X_test = np.array(map(lambda x: emb_model.infer_vector(x), X[test_idx]))
+
+    # Generate Predictions & Confidence Estimates
+    y_pred = model.predict_classes(_X_test)
+    y_prob = model.predict_proba(_X_test)
+    
     # Append to Report
-    y_prob = map(lambda x: x[1][x[0]], zip(y_pred, y_prob))
+    y_prob = map(lambda x: x[0], y_prob)
     report.append_result(Y[test_idx].reshape(y_pred.shape), y_pred, y_prob)
-
+    
 # Generate Prediction Reports
 report.generate_report()
