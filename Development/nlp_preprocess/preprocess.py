@@ -32,7 +32,7 @@ sys.setdefaultencoding('utf8')
 DATA_ROOT = '../../Data/dataset/'       # Root Folder of where Dataset Resides
 MODEL_ROOT = '../../Models/dataset/'    # Root Folder of where Model Resides
 
-POOL_THREADS = 16
+POOL_THREADS = 64
 
 ''' Import Data '''
 # Load Dataset
@@ -102,132 +102,114 @@ ngram_feat = lambda x: [ngram_ptext(x, i) for i in range(6)]
 
 def preprocess(x):
     print('PROCESSING ID: ' + str(x['id']))
-    fvec = []
-    fvec.append(int(x['id'])) # Append Article ID
-    fvec.append(nnp_num(x['targetTitle']))
-    if len(x['targetParagraphs']) > 0:
-        fvec.append(ts.automated_readability_index(' '.join(x['targetParagraphs'])))
-        fvec.append(ts.avg_letter_per_word(' '.join(x['targetParagraphs'])))
-        fvec.append(ts.avg_sentence_length(' '.join(x['targetParagraphs'])))
-        fvec.append(ts.avg_sentence_per_word(' '.join(x['targetParagraphs'])))
-        fvec.append(ts.avg_syllables_per_word(' '.join(x['targetParagraphs'])))
-        fvec.append(ts.char_count(' '.join(x['targetParagraphs'])))
-        fvec.append(ts.coleman_liau_index(' '.join(x['targetParagraphs'])))
-        fvec.append(ts.dale_chall_readability_score(' '.join(x['targetParagraphs'])))
-        fvec.append(ts.difficult_words(' '.join(x['targetParagraphs'])))
-        fvec.append(ts.flesch_kincaid_grade(' '.join(x['targetParagraphs'])))
-        fvec.append(ts.flesch_reading_ease(' '.join(x['targetParagraphs'])))
-        fvec.append(ts.gunning_fog(' '.join(x['targetParagraphs'])))
-        fvec.append(ts.lexicon_count(' '.join(x['targetParagraphs'])))
-        fvec.append(ts.linsear_write_formula(' '.join(x['targetParagraphs'])))
-        fvec.append(ts.polysyllabcount(' '.join(x['targetParagraphs'])))
-        fvec.append(ts.sentence_count(' '.join(x['targetParagraphs'])))
-        fvec.append(ts.smog_index(' '.join(x['targetParagraphs'])))
-        fvec.append(ts.syllable_count(' '.join(x['targetParagraphs'])))
-        fvec.append(mean_wordlen(x['targetParagraphs']))
-        fvec += ratio(x['targetParagraphs'])
-        fvec += ngram_feat(x['targetParagraphs'])
-    else:
-        fvec += [0]*55
-    if len(x['postText']) > 0:
-        fvec.append(max_wordlen(x['postText']))
-        fvec.append(sw_ratio(' '.join(x['postText'])))
-        fvec += ngram_feat(x['postText'])
-    else:
-        fvec += [0]*8
-    fvec.append(len(word_tokenize(x['targetTitle'])))
-    fvec.append(wlen_title(x['targetTitle']))
-    fvec.append(pos_2gram(x['targetTitle'], 'NNP', 'NNP'))
-    fvec.append(int(num_start(x['targetTitle'])))
-    fvec.append(in_num(x['targetTitle']))
-    fvec.append(pos_2gram(x['targetTitle'], 'NNP', 'VBZ'))
-    fvec.append(pos_2gram(x['targetTitle'], 'IN', 'NNP'))
-    fvec.append(wrb_num(x['targetTitle']))
-    fvec.append(nnp_num(x['targetTitle']))
-    fvec.append(int(wh_start(x['targetTitle'])))
-    fvec.append(int(qm_exist(x['targetTitle'])))
-    fvec.append(pos_thnn(x['targetTitle']))
-    fvec.append(prp_count(x['targetTitle']))
-    fvec.append(vbz_count(x['targetTitle']))
-    fvec.append(pos_3gram(x['targetTitle'], 'NNP', 'NNP', 'VBZ'))
-    fvec.append(pos_2gram(x['targetTitle'], 'NN', 'IN'))
-    fvec.append(pos_3gram(x['targetTitle'], 'NN', 'IN', 'NNP'))
-    fvec.append(pos_2gram(x['targetTitle'], 'NNP', '.'))
-    fvec.append(pos_2gram(x['targetTitle'], 'PRP', 'VBP'))
-    fvec.append(wp_count(x['targetTitle']))
-    fvec.append(dt_count(x['targetTitle']))
-    fvec.append(pos_2gram(x['targetTitle'], 'NNP', 'IN'))
-    fvec.append(pos_3gram(x['targetTitle'], 'IN', 'NNP', 'NNP'))
-    fvec.append(pos_count(x['targetTitle']))
-    fvec.append(pos_2gram(x['targetTitle'], 'IN', 'NN'))
-    if len(x['targetKeywords']) > 0 and len(x['postText']) > 0:
-        fvec.append(kw_post_match(x['targetKeywords'], x['postText']))
-    else:
-        fvec += [0]*1
-    fvec.append(comma_count(x['targetTitle']))
-    fvec.append(pos_2gram(x['targetTitle'], 'NNP', 'NNS'))
-    fvec.append(pos_2gram(x['targetTitle'], 'IN', 'JJ'))
-    fvec.append(pos_2gram(x['targetTitle'], 'NNP', 'POS'))
-    fvec.append(wdt_count(x['targetTitle']))
-    fvec.append(pos_2gram(x['targetTitle'], 'NN', 'NN'))
-    fvec.append(pos_2gram(x['targetTitle'], 'NN', 'NNP'))
-    fvec.append(pos_2gram(x['targetTitle'], 'NNP', 'VBD'))
-    fvec.append(rb_count(x['targetTitle']))
-    fvec.append(pos_3gram(x['targetTitle'], 'NNP', 'NNP', 'NNP'))
-    fvec.append(pos_3gram(x['targetTitle'], 'NNP', 'NNP', 'NN'))
-    fvec.append(rbs_count(x['targetTitle']))
-    fvec.append(vbn_count(x['targetTitle']))
-    fvec.append(pos_2gram(x['targetTitle'], 'VBN', 'IN'))
-    fvec.append(pos_2gram(x['targetTitle'], 'JJ', 'NNP'))
-    fvec.append(pos_3gram(x['targetTitle'], 'NNP', 'NN', 'NN'))
-    fvec.append(pos_2gram(x['targetTitle'], 'DT', 'NN'))
-    fvec.append(ex_exist(x['targetTitle']))
-    fvec += ngram_feat(x['targetTitle'])
+    try:
+        fvec = []
+        fvec.append(int(x['id'])) # Append Article ID
+        fvec.append(nnp_num(x['targetTitle']))
+        if len(x['targetParagraphs']) > 0:
+            fvec.append(ts.automated_readability_index(' '.join(x['targetParagraphs'])))
+            fvec.append(ts.avg_letter_per_word(' '.join(x['targetParagraphs'])))
+            fvec.append(ts.avg_sentence_length(' '.join(x['targetParagraphs'])))
+            fvec.append(ts.avg_sentence_per_word(' '.join(x['targetParagraphs'])))
+            fvec.append(ts.avg_syllables_per_word(' '.join(x['targetParagraphs'])))
+            fvec.append(ts.char_count(' '.join(x['targetParagraphs'])))
+            fvec.append(ts.coleman_liau_index(' '.join(x['targetParagraphs'])))
+            fvec.append(ts.dale_chall_readability_score(' '.join(x['targetParagraphs'])))
+            fvec.append(ts.difficult_words(' '.join(x['targetParagraphs'])))
+            fvec.append(ts.flesch_kincaid_grade(' '.join(x['targetParagraphs'])))
+            fvec.append(ts.flesch_reading_ease(' '.join(x['targetParagraphs'])))
+            fvec.append(ts.gunning_fog(' '.join(x['targetParagraphs'])))
+            fvec.append(ts.lexicon_count(' '.join(x['targetParagraphs'])))
+            fvec.append(ts.linsear_write_formula(' '.join(x['targetParagraphs'])))
+            fvec.append(ts.polysyllabcount(' '.join(x['targetParagraphs'])))
+            fvec.append(ts.sentence_count(' '.join(x['targetParagraphs'])))
+            fvec.append(ts.smog_index(' '.join(x['targetParagraphs'])))
+            fvec.append(ts.syllable_count(' '.join(x['targetParagraphs'])))
+            fvec.append(mean_wordlen(x['targetParagraphs']))
+            fvec += ratio(x['targetParagraphs'])
+            fvec += ngram_feat(x['targetParagraphs'])
+        else:
+            fvec += [0]*55
+        if len(x['postText']) > 0:
+            fvec.append(max_wordlen(x['postText']))
+            fvec.append(sw_ratio(' '.join(x['postText'])))
+            fvec += ngram_feat(x['postText'])
+        else:
+            fvec += [0]*8
+        fvec.append(len(word_tokenize(x['targetTitle'])))
+        fvec.append(wlen_title(x['targetTitle']))
+        fvec.append(pos_2gram(x['targetTitle'], 'NNP', 'NNP'))
+        fvec.append(int(num_start(x['targetTitle'])))
+        fvec.append(in_num(x['targetTitle']))
+        fvec.append(pos_2gram(x['targetTitle'], 'NNP', 'VBZ'))
+        fvec.append(pos_2gram(x['targetTitle'], 'IN', 'NNP'))
+        fvec.append(wrb_num(x['targetTitle']))
+        fvec.append(nnp_num(x['targetTitle']))
+        fvec.append(int(wh_start(x['targetTitle'])))
+        fvec.append(int(qm_exist(x['targetTitle'])))
+        fvec.append(pos_thnn(x['targetTitle']))
+        fvec.append(prp_count(x['targetTitle']))
+        fvec.append(vbz_count(x['targetTitle']))
+        fvec.append(pos_3gram(x['targetTitle'], 'NNP', 'NNP', 'VBZ'))
+        fvec.append(pos_2gram(x['targetTitle'], 'NN', 'IN'))
+        fvec.append(pos_3gram(x['targetTitle'], 'NN', 'IN', 'NNP'))
+        fvec.append(pos_2gram(x['targetTitle'], 'NNP', '.'))
+        fvec.append(pos_2gram(x['targetTitle'], 'PRP', 'VBP'))
+        fvec.append(wp_count(x['targetTitle']))
+        fvec.append(dt_count(x['targetTitle']))
+        fvec.append(pos_2gram(x['targetTitle'], 'NNP', 'IN'))
+        fvec.append(pos_3gram(x['targetTitle'], 'IN', 'NNP', 'NNP'))
+        fvec.append(pos_count(x['targetTitle']))
+        fvec.append(pos_2gram(x['targetTitle'], 'IN', 'NN'))
+        if len(x['targetKeywords']) > 0 and len(x['postText']) > 0:
+            fvec.append(kw_post_match(x['targetKeywords'], x['postText']))
+        else:
+            fvec += [0]*1
+        fvec.append(comma_count(x['targetTitle']))
+        fvec.append(pos_2gram(x['targetTitle'], 'NNP', 'NNS'))
+        fvec.append(pos_2gram(x['targetTitle'], 'IN', 'JJ'))
+        fvec.append(pos_2gram(x['targetTitle'], 'NNP', 'POS'))
+        fvec.append(wdt_count(x['targetTitle']))
+        fvec.append(pos_2gram(x['targetTitle'], 'NN', 'NN'))
+        fvec.append(pos_2gram(x['targetTitle'], 'NN', 'NNP'))
+        fvec.append(pos_2gram(x['targetTitle'], 'NNP', 'VBD'))
+        fvec.append(rb_count(x['targetTitle']))
+        fvec.append(pos_3gram(x['targetTitle'], 'NNP', 'NNP', 'NNP'))
+        fvec.append(pos_3gram(x['targetTitle'], 'NNP', 'NNP', 'NN'))
+        fvec.append(rbs_count(x['targetTitle']))
+        fvec.append(vbn_count(x['targetTitle']))
+        fvec.append(pos_2gram(x['targetTitle'], 'VBN', 'IN'))
+        fvec.append(pos_2gram(x['targetTitle'], 'JJ', 'NNP'))
+        fvec.append(pos_3gram(x['targetTitle'], 'NNP', 'NN', 'NN'))
+        fvec.append(pos_2gram(x['targetTitle'], 'DT', 'NN'))
+        fvec.append(ex_exist(x['targetTitle']))
+        fvec += ngram_feat(x['targetTitle'])
+    except Exception as e:
+        print('EXCEPTION AT ID ' + str(x['id']))
+        sys.exit()
+
     return fvec
 
 ''' Perform Preprocessing '''
 def build_rec(row):
     data = ''
     for i, x in enumerate(row):
-        if i < len(row)-1: 
+        if i < len(row)-1:
             data += str(x)+','
         else:
             data += str(x)
     data += '\n'
     return data
 
-'''
+
 p = Pool(POOL_THREADS)
-X = p.map(preprocess, train_X)
+X = p.map(preprocess, train_X[101:201])
 p.close()
 p.join()
 
 print('\nWriting Results to File')
-output = open('features.csv', 'wb')
+output = open('feat001.csv', 'wb')
 map(lambda x: output.write(build_rec(x)), X)
 output.close()
 
 print('\nDONE!')
-'''
-
-'''
-PROCESSING ID: 1941
-PROCESSING ID: 3042
-PROCESSING ID: 13
-PROCESSING ID: 4139
-PROCESSING ID: 1391
-PROCESSING ID: 2765
-PROCESSING ID: 2487
-PROCESSING ID: 3319
-'''
-
-X = train_X
-preprocess(X[1941])
-preprocess(X[3042])
-preprocess(X[13])
-preprocess(X[4139])
-preprocess(X[1391])
-preprocess(X[2765])
-preprocess(X[2765])
-preprocess(X[2487])
-preprocess(X[3319])
