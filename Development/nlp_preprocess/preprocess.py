@@ -130,7 +130,7 @@ def preprocess(x):
             fvec += ngram_feat(x['targetParagraphs'])
         else:
             fvec += [0]*55
-        if len(x['postText']) > 0:
+        if len(word_tokenize(' '.join(x['postText']))) > 0:
             fvec.append(max_wordlen(x['postText']))
             fvec.append(sw_ratio(' '.join(x['postText'])))
             fvec += ngram_feat(x['postText'])
@@ -186,6 +186,7 @@ def preprocess(x):
         fvec += ngram_feat(x['targetTitle'])
     except Exception as e:
         print('EXCEPTION AT ID ' + str(x['id']))
+        print(e)
         sys.exit()
 
     return fvec
@@ -201,7 +202,7 @@ def build_rec(row):
     data += '\n'
     return data
 
-
+'''
 p = Pool(POOL_THREADS)
 X = p.map(preprocess, train_X[101:201])
 p.close()
@@ -213,3 +214,7 @@ map(lambda x: output.write(build_rec(x)), X)
 output.close()
 
 print('\nDONE!')
+'''
+
+print(train_X[2235])
+print(preprocess(train_X[2235]))
