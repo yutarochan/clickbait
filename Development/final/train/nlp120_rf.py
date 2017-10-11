@@ -48,5 +48,5 @@ randforest.fit(X, Y)
 ''' Persist Model to File '''
 print('Pickling (Persisting) Model')
 model_output = open(MODEL_ROOT+'nlp120_rf.pkl', 'wb')
-s = pickle.dumps(randforest, model_output, protocol=2)
+s = pickle.dump(randforest, model_output)
 model_output.close()

@@ -48,5 +48,5 @@ model.fit(X, Y)
 ''' Persist Model to File '''
 print('Pickling (Persisting) Model')
 model_output = open(MODEL_ROOT+'nlp120_xgb.pkl', 'wb')
-s = pickle.dumps(model, model_output, protocol=2)
+s = pickle.dump(model, model_output)
 model_output.close()
