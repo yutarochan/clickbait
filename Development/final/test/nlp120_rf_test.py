@@ -3,6 +3,10 @@ NLP 120 Features + Random Forest Model
 Author: Yuya Jeremy Ong (yjo5006@psu.edu)
 '''
 from __future__ import print_function
+import sys
+import csv
+import pickle
+import numpy as np
 
 sys.path.append('../..')
 from util.load_data import JSONData
