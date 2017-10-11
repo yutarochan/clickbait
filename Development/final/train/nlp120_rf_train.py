@@ -50,7 +50,9 @@ randforest.fit(X, Y)
 data = csv.reader(open('../../../Data/test_feat.csv', 'rb'), delimiter=',')
 X_test = np.array(map(lambda x: map(lambda y: float(y), x), data))
 
-print(len(X_test[0]))
+print('PREFILTER: ' + str(len(X_test)))
+X = filter(lambda x: len(x) == 121, X_test)
+print('POSTFILTER: ' + str(len(X_test)))
 
 # Filter Out Invalid Results
 
