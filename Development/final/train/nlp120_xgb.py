@@ -12,7 +12,7 @@ from nltk import word_tokenize
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.model_selection import KFold, StratifiedKFold
 
-sys.path.append('..')
+sys.path.append('../..')
 from util.load_data import JSONData
 
 import warnings
