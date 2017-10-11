@@ -10,8 +10,7 @@ import csv
 import string
 import numpy as np
 from nltk import word_tokenize
-from imblearn.over_sampling import SMOTE
-from sklearn.naive_bayes import GaussianNB
+from sklearn.ensemble import RandomForestClassifier
 from sklearn.model_selection import KFold, StratifiedKFold
 
 sys.path.append('..')
@@ -28,7 +27,7 @@ K_FOLD = 10
 SHUFFLE_FOLDS = True
 np.random.seed(9892)                    # Seed Parameter for PRNG
 
-report = ScoreReport('Baseline Model + StratifiedKFold - FIXED ROC')  # Automated Score Reporting Utility
+report = ScoreReport('Baseline120 Naive Bayes')  # Automated Score Reporting Utility
 
 ''' Import Data '''
 # Load Dataset
@@ -53,18 +52,14 @@ kf = StratifiedKFold(n_splits=K_FOLD, shuffle=SHUFFLE_FOLDS)
 print('Training Model...')
 for i, (train_idx, test_idx) in enumerate(kf.split(X, Y_)):
     print('\n[K = ' + str(i+1) + ']')
-    ''' SMOTE - Generate Synthetic Data '''
-    # sm = SMOTE(kind='regular')
-    # X_resampled = []
-    # X_res, Y_res = sm.fit_sample(X[train_idx], Y[train_idx])
 
     # Train Model
-    gnb = GaussianNB()
-    gnb.fit(X[train_idx], Y[train_idx])
+    randforest = RandomForestClassifier(criterion='entropy')
+    randforest.fit(X[train_idx], Y[train_idx])
 
     # Generate Predictions & Confidence Estimates
-    y_pred = gnb.predict(X[test_idx])
-    y_prob = gnb.predict_proba(X[test_idx])
+    y_pred = randforest.predict(X[test_idx])
+    y_prob = randforest.predict_proba(X[test_idx])
 
     # Append to Report
     y_prob = map(lambda x: x[1][x[0]], zip(y_pred, y_prob))
