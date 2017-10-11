@@ -45,8 +45,20 @@ print('Training Full Model')
 randforest = RandomForestClassifier(criterion='entropy')
 randforest.fit(X, Y)
 
-''' Persist Model to File '''
+''' Persist Model to File
 print('Pickling (Persisting) Model')
 model_output = open(MODEL_ROOT+'nlp120_rf.pkl', 'wb')
 s = pickle.dump(randforest, model_output)
 model_output.close()
+'''
+
+''' Generate Predictions '''
+data = csv.reader(open('../../../Data/test_feat.csv', 'rb'), delimiter=',')
+X_test = map(lambda x: map(lambda y: float(y), x), data)
+
+# Generate Predictions
+output = open('predictions.csv', 'wb')
+map(lambda x: output.write(str(int(x[0])) + ',' + model.predict(x[1:])))
+output.close()
+
+print('DONE!')
