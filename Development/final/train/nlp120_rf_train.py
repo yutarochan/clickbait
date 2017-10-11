@@ -8,6 +8,7 @@ import csv
 import string
 import pickle
 import numpy as np
+import pandas as pd
 from nltk import word_tokenize
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.model_selection import KFold, StratifiedKFold
@@ -45,28 +46,11 @@ print('Training Full Model')
 randforest = RandomForestClassifier(criterion='entropy')
 randforest.fit(X, Y)
 
-''' Generate Predictions '''
-# Generate Predictions
-data = csv.reader(open('../../../Data/test_feat.csv', 'rb'), delimiter=',')
-X_test = np.array(map(lambda x: map(lambda y: float(y), x), data))
+''' Test Model - Generate Predictions '''
+data = pd.read_csv('../../../Data/test_feat.csv', sep=',',header=None)
+data = data.replace([np.inf, -np.inf, np.nan], 0) # Replace missing or infinite values with zero.
+X_test = data.values
 
-print('PREFILTER: ' + str(len(X_test)))
-X = filter(lambda x: len(x), X_test)
-print('POSTFILTER: ' + str(len(X)))
+print(map(lambda x: x.shape, X_test))
 
-# Y_pred = map(lambda x: randforest.predict(np.array([x[1:]])), X_test)
-
-# Filter Out Invalid Results
-
-# Generate Predictions
-# Y_pred = map(lambda x: randforest.predict([x[1:]]), X_test)
-
-# print(Y_pred[:10])
-# print(X_test.shape)
-
-# Generate Predictions
-# output = open('predictions.csv', 'wb')
-# map(lambda x: output.write(str(int(x[0])) + ',' + str(x[1]), zip(X_test, Y_pred))
-# output.close()
-
-# print('DONE!')
+Y_pred = map(lambda x: randforest.predict([x[1:]]), X_test)
