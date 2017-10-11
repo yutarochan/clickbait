@@ -58,7 +58,7 @@ X_test = map(lambda x: map(lambda y: float(y), x), data)
 
 # Generate Predictions
 output = open('predictions.csv', 'wb')
-map(lambda x: output.write(str(int(x[0])) + ',' + randforest.predict([x[1:]])), randforest.predict(x[1:])))
+map(lambda x: output.write(str(int(x[0])) + ',' + randforest.predict([x[1:]])), randforest.predict(x[1:]))
 output.close()
 
 print('DONE!')
