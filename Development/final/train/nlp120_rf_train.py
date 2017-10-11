@@ -51,11 +51,9 @@ data = csv.reader(open('../../../Data/test_feat.csv', 'rb'), delimiter=',')
 X_test = map(lambda x: map(lambda y: float(y), x), data)
 
 # Generate Predictions
-Y_pred = randforest.predict([x[1:]])
+Y_pred = map(lambda x: randforest.predict([x[1:]]), X_test)
 
 # print(Y_pred[:10])
-
-print(X.shape)
 print(X_test.shape)
 
 # Generate Predictions
