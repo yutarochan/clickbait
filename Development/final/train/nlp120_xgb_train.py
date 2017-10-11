@@ -10,7 +10,6 @@ import pickle
 import numpy as np
 from nltk import word_tokenize
 from xgboost.sklearn import XGBClassifier
-from sklearn.model_selection import KFold, StratifiedKFold
 
 sys.path.append('../..')
 from util.load_data import JSONData
