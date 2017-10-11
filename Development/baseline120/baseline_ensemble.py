@@ -28,10 +28,10 @@ K_FOLD = 10
 SHUFFLE_FOLDS = True
 np.random.seed(9892)                    # Seed Parameter for PRNG
 
-THREADS = 16
-VOTING_METHOD = 'hard'
+THREADS = 256
+VOTING_METHOD = 'soft'
 
-report = ScoreReport('Baseline Ensemble (RF + XGB) - Hard Voting Method')  # Automated Score Reporting Utility
+report = ScoreReport('Baseline Ensemble (RF + XGB) - Soft Voting Method')  # Automated Score Reporting Utility
 
 ''' Import Data '''
 # Load Dataset
