@@ -48,7 +48,7 @@ randforest.fit(X, Y)
 ''' Generate Predictions '''
 # Generate Predictions
 data = csv.reader(open('../../../Data/test_feat.csv', 'rb'), delimiter=',')
-X_test = map(lambda x: map(lambda y: float(y), x), data)
+X_test = np.array(map(lambda x: map(lambda y: float(y), x), data))
 
 print(X_test.shape)
 
