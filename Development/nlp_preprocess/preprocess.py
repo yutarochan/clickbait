@@ -32,7 +32,7 @@ sys.setdefaultencoding('utf8')
 DATA_ROOT = '../../Data/dataset/'       # Root Folder of where Dataset Resides
 MODEL_ROOT = '../../Models/dataset/'    # Root Folder of where Model Resides
 
-POOL_THREADS = 64
+POOL_THREADS = 256
 
 ''' Import Data '''
 # Load Dataset
@@ -202,19 +202,19 @@ def build_rec(row):
     data += '\n'
     return data
 
-'''
+
 p = Pool(POOL_THREADS)
-X = p.map(preprocess, train_X[101:201])
+X = p.map(preprocess, train_X[16000:17001])
 p.close()
 p.join()
 
 print('\nWriting Results to File')
-output = open('feat001.csv', 'wb')
+output = open('feat017.csv', 'wb')
 map(lambda x: output.write(build_rec(x)), X)
 output.close()
 
 print('\nDONE!')
-'''
 
-print(train_X[2235])
-print(preprocess(train_X[2235]))
+
+# print(train_X[2235])
+# print(preprocess(train_X[2235]))
