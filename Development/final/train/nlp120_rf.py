@@ -21,9 +21,7 @@ warnings.filterwarnings("ignore")
 ''' Constants and Parameters '''
 DATA_ROOT = '../../../Data/dataset/'       # Root Folder of where Dataset Resides
 MODEL_ROOT = '../../../Models/'            # Root Folder of where Model Resides
-K_FOLD = 10
-SHUFFLE_FOLDS = True
-np.random.seed(9892)                    # Seed Parameter for PRNG
+np.random.seed(9892)                       # Seed Parameter for PRNG
 
 ''' Import Data '''
 # Load Dataset
@@ -50,5 +48,5 @@ randforest.fit(X, Y)
 ''' Persist Model to File '''
 print('Pickling (Persisting) Model')
 model_output = open(MODEL_ROOT+'nlp120_rf.pkl', 'wb')
-s = pickle.dumps(randforest, model_output)
+s = pickle.dumps(randforest, model_output, protocol=2)
 model_output.close()
