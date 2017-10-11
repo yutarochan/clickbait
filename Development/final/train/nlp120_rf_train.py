@@ -52,7 +52,7 @@ X_test = np.array(map(lambda x: map(lambda y: float(y), x), data))
 
 print('PREFILTER: ' + str(len(X_test)))
 X = filter(lambda x: len(x), X_test)
-print('POSTFILTER: ' + str(len(X_test)))
+print('POSTFILTER: ' + str(len(X)))
 
 # Y_pred = map(lambda x: randforest.predict(np.array([x[1:]])), X_test)
 
