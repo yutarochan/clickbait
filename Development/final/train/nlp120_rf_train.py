@@ -50,6 +50,11 @@ randforest.fit(X, Y)
 data = csv.reader(open('../../../Data/test_feat.csv', 'rb'), delimiter=',')
 X_test = map(lambda x: map(lambda y: float(y), x), data)
 
+# Filter Out Invalid Results
+print('PREFILTER: ' + str(len(X_test)))
+X = filter(lambda x: len(x) == 121, X_test)
+print('POSTFILTER: ' + str(len(X_test)))
+
 # Generate Predictions
 Y_pred = map(lambda x: randforest.predict([x[1:]]), X_test)
 
