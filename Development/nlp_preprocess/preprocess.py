@@ -202,7 +202,6 @@ def build_rec(row):
     data += '\n'
     return data
 
-'''
 p = Pool(POOL_THREADS)
 X = p.map(preprocess, train_X[101:201])
 p.close()
@@ -214,7 +213,3 @@ map(lambda x: output.write(build_rec(x)), X)
 output.close()
 
 print('\nDONE!')
-'''
-
-print(train_X[2235])
-print(preprocess(train_X[2235]))
