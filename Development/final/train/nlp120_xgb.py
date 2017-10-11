@@ -9,7 +9,7 @@ import string
 import pickle
 import numpy as np
 from nltk import word_tokenize
-from sklearn.ensemble import RandomForestClassifier
+from xgboost.sklearn import XGBClassifier
 from sklearn.model_selection import KFold, StratifiedKFold
 
 sys.path.append('../..')
