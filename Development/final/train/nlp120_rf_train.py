@@ -32,7 +32,7 @@ train_Y = data_load.load_train_Y()
 
 # Filter Out Invalid Results
 print('PREFILTER: ' + str(len(X)))
-X = filter(lambda x: len(x) == 121, X)
+X = filter(lambda x: len(x) == 114, X)
 print('POSTFILTER: ' + str(len(X)))
 
 # Filter/Process Adjusting Results
