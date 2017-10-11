@@ -41,6 +41,8 @@ data_load = JSONData(DATA_ROOT+'instances_train.jsonl', DATA_ROOT+'truth_train.j
 train_X = data_load.load_train_X()
 train_Y = data_load.load_train_Y()
 
+test_X = data_load.load_test()
+
 ''' Define Preprocessing Functions '''
 pos_list = ['CC', 'CD', 'DT', 'EX', 'FW', 'IN', 'JJ', 'JJR', 'JJS', 'LS', 'MD', 'NN', 'NNS', 'NNP', 'NNPS', 'PDT', 'POS', 'PRP', 'PRP$', 'RB', 'RBR', 'RBS', 'RP', 'SYM', 'TO', 'UH', 'VB', 'VBD', 'VBG', 'VBN', 'VBP', 'VBZ', 'WDT', 'WP', 'WP$', 'WRB']
 
@@ -203,12 +205,12 @@ def build_rec(row):
     return data
 
 p = Pool(POOL_THREADS)
-X = p.map(preprocess, train_X[17000:])
+X = p.map(preprocess, test_X)
 p.close()
 p.join()
 
 print('\nWriting Results to File')
-output = open('feat018.csv', 'wb')
+output = open('test_feat.csv', 'wb')
 map(lambda x: output.write(build_rec(x)), X)
 output.close()
 
