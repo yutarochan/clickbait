@@ -56,9 +56,9 @@ X = filter(lambda x: len(x) == 121, X_test)
 print('POSTFILTER: ' + str(len(X_test)))
 
 # Generate Predictions
-Y_pred = map(lambda x: randforest.predict([x[1:]]), X_test)
+# Y_pred = map(lambda x: randforest.predict([x[1:]]), X_test)
 
-print(Y_pred[:10])
+# print(Y_pred[:10])
 # print(X_test.shape)
 
 # Generate Predictions
