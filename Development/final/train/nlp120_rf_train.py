@@ -50,7 +50,7 @@ randforest.fit(X, Y)
 data = csv.reader(open('../../../Data/test_feat.csv', 'rb'), delimiter=',')
 X_test = np.array(map(lambda x: map(lambda y: float(y), x), data))
 
-print(X_test.shape)
+print(len(X_test[0]))
 
 # Filter Out Invalid Results
 
