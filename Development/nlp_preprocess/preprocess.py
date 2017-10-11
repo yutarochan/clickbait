@@ -131,7 +131,7 @@ def preprocess(x):
             fvec += ratio(x['targetParagraphs'])
             fvec += ngram_feat(x['targetParagraphs'])
         else:
-            fvec += [0]*55
+            fvec += [0]*61
         if len(word_tokenize(' '.join(x['postText']))) > 0:
             fvec.append(max_wordlen(x['postText']))
             fvec.append(sw_ratio(' '.join(x['postText'])))
