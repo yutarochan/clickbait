@@ -32,7 +32,7 @@ train_Y = data_load.load_train_Y()
 
 # Filter Out Invalid Results
 print('PREFILTER: ' + str(len(X)))
-X = filter(lambda x: len(x) == 114, X)
+X = filter(lambda x: len(x) == 121, X)
 print('POSTFILTER: ' + str(len(X)))
 
 # Filter/Process Adjusting Results
@@ -50,10 +50,12 @@ randforest.fit(X, Y)
 data = csv.reader(open('../../../Data/test_feat.csv', 'rb'), delimiter=',')
 X_test = map(lambda x: map(lambda y: float(y), x), data)
 
+print(X_test.shape)
+
 # Filter Out Invalid Results
 
 # Generate Predictions
-Y_pred = map(lambda x: randforest.predict([x[1:]]), X_test)
+# Y_pred = map(lambda x: randforest.predict([x[1:]]), X_test)
 
 # print(Y_pred[:10])
 # print(X_test.shape)
