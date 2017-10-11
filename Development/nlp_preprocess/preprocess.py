@@ -203,12 +203,12 @@ def build_rec(row):
     return data
 
 p = Pool(POOL_THREADS)
-X = p.map(preprocess, train_X[16000:17001])
+X = p.map(preprocess, train_X[17000:])
 p.close()
 p.join()
 
 print('\nWriting Results to File')
-output = open('feat017.csv', 'wb')
+output = open('feat018.csv', 'wb')
 map(lambda x: output.write(build_rec(x)), X)
 output.close()
 
