@@ -10,9 +10,9 @@ import csv
 import string
 import numpy as np
 from nltk import word_tokenize
-from sklearn.naive_bayes import GaussianNB
-from sklearn.linear_model import LogisticRegression
+from xgboost.sklearn import XGBClassifier
 from sklearn.model_selection import KFold, StratifiedKFold
+from sklearn.ensemble import RandomForestClassifier, VotingClassifier
 
 sys.path.append('..')
 from util.load_data import JSONData
@@ -28,7 +28,10 @@ K_FOLD = 10
 SHUFFLE_FOLDS = True
 np.random.seed(9892)                    # Seed Parameter for PRNG
 
-report = ScoreReport('Baseline Model + StratifiedKFold - FIXED ROC')  # Automated Score Reporting Utility
+THREADS = 16
+VOTING_METHOD = 'hard'
+
+report = ScoreReport('Baseline Ensemble (RF + XGB) - Hard Voting Method')  # Automated Score Reporting Utility
 
 ''' Import Data '''
 # Load Dataset
@@ -53,14 +56,16 @@ kf = StratifiedKFold(n_splits=K_FOLD, shuffle=SHUFFLE_FOLDS)
 print('Training Model...')
 for i, (train_idx, test_idx) in enumerate(kf.split(X, Y_)):
     print('\n[K = ' + str(i+1) + ']')
+    # Initialize Models
+    randforest = RandomForestClassifier(criterion='entropy')
+    xgb = XGBClassifier()
 
-    # Train Model
-    gnb = GaussianNB()
-    gnb.fit(X[train_idx], Y[train_idx])
+    ensemb = VotingClassifier(estimators=[('rf', randforest), ('xgb', xgb)], voting=VOTING_METHOD, n_jobs=THREADS)
+    ensemb.fit(X[train_idx], Y[train_idx])
 
     # Generate Predictions & Confidence Estimates
-    y_pred = gnb.predict(X[test_idx])
-    y_prob = gnb.predict_proba(X[test_idx])
+    y_pred = ensemb.predict(X[test_idx])
+    y_prob = ensemb.predict_proba(X[test_idx])
 
     # Append to Report
     y_prob = map(lambda x: x[1][x[0]], zip(y_pred, y_prob))
