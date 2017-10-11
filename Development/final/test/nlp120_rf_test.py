@@ -26,7 +26,7 @@ X = map(lambda x: map(lambda y: float(y), x), data)
 
 ''' Generate Predictions '''
 # Load Model from Pickle
-model_data = open(MODEL_ROOT+'nlp120_rf.pkl', 'wb')
+model_data = open(MODEL_ROOT+'nlp120_rf.pkl', 'rb')
 model = pickle.load(model_data)
 
 # Generate Predictions
