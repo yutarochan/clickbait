@@ -19,14 +19,14 @@ import warnings
 warnings.filterwarnings("ignore")
 
 ''' Constants and Parameters '''
-DATA_ROOT = '../../Data/dataset/'       # Root Folder of where Dataset Resides
-MODEL_ROOT = '../../Models/'            # Root Folder of where Model Resides
+DATA_ROOT = '../../../Data/dataset/'       # Root Folder of where Dataset Resides
+MODEL_ROOT = '../../../Models/'            # Root Folder of where Model Resides
 np.random.seed(9892)                    # Seed Parameter for PRNG
 
 ''' Import Data '''
 # Load Dataset
 data_load = JSONData(DATA_ROOT+'instances_train.jsonl', DATA_ROOT+'truth_train.jsonl', DATA_ROOT+'instances_test.jsonl')
-raw_data = csv.reader(open('../../Data/feat.csv', 'rb'), delimiter=',')
+raw_data = csv.reader(open('../../../Data/feat.csv', 'rb'), delimiter=',')
 X = map(lambda x: map(lambda y: float(y), x), raw_data)
 train_Y = data_load.load_train_Y()
 
