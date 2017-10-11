@@ -210,7 +210,7 @@ p.close()
 p.join()
 
 print('\nWriting Results to File')
-output = open('test_feat.csv', 'wb')
+output = open('test_feat_2.csv', 'wb')
 map(lambda x: output.write(build_rec(x)), X)
 output.close()
 

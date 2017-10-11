@@ -24,8 +24,16 @@ np.random.seed(9892)                       # Seed Parameter for PRNG
 data = csv.reader(open('../../../Data/test_feat.csv', 'rb'), delimiter=',')
 X = map(lambda x: map(lambda y: float(y), x), data)
 
-# Filter Out Invalid Results
-# TODO: IF THERE IS A FILTER ISSUE WE NEED TO FIX ASAP!
-print('PREFILTER: ' + str(len(X)))
-X = filter(lambda x: len(x) == 121, X)
-print('POSTFILTER: ' + str(len(X)))
+''' Generate Predictions '''
+# Load Model from Pickle
+model_data = open(MODEL_ROOT+'nlp120_rf.pkl', 'wb')
+model = pickle.load(model_data)
+
+# Generate Predictions
+output = open('predictions.csv', 'wb')
+map(lambda x: output.write(str(int(x[0])) + ',' + model.predict(x[1:])))
+
+output.close()
+model_data.close()
+
+print('DONE!')
