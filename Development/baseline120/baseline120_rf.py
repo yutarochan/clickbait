@@ -27,7 +27,7 @@ K_FOLD = 10
 SHUFFLE_FOLDS = True
 np.random.seed(9892)                    # Seed Parameter for PRNG
 
-report = ScoreReport('Baseline120 Naive Bayes')  # Automated Score Reporting Utility
+report = ScoreReport('Baseline120 Random Forest Classifier')  # Automated Score Reporting Utility
 
 ''' Import Data '''
 # Load Dataset
