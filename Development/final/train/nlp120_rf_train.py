@@ -54,6 +54,7 @@ print('PREFILTER: ' + str(len(X_test)))
 X = filter(lambda x: len(x) == 121, X_test)
 print('POSTFILTER: ' + str(len(X_test)))
 
+Y_pred = map(lambda x: randforest.predict(x[1:]), X_test)
 
 # Filter Out Invalid Results
 
