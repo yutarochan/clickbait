@@ -1,4 +1,4 @@
-'''
+y'''
 Feature Extraction Script
 Script used to perform the preprocessing externally.
 
@@ -32,16 +32,26 @@ sys.setdefaultencoding('utf8')
 DATA_ROOT = '../../Data/dataset/'       # Root Folder of where Dataset Resides
 MODEL_ROOT = '../../Models/dataset/'    # Root Folder of where Model Resides
 
+ALT_DATA_ROOT = '/tmp/clickbait/Data/clickbait17-train-170331/'
+
 POOL_THREADS = 256
 
 ''' Import Data '''
 # Load Dataset
 print('Loading Dataset...')
+'''
 data_load = JSONData(DATA_ROOT+'instances_train.jsonl', DATA_ROOT+'truth_train.jsonl', DATA_ROOT+'instances_test.jsonl')
 train_X = data_load.load_train_X()
 train_Y = data_load.load_train_Y()
 
 test_X = data_load.load_test()
+'''
+
+''' Micro-Validation Dataset '''
+ALT_DATA_ROOT = '/tmp/clickbait/Data/clickbait17-train-170331/'
+data_load = JSONData(ALT_DATA_ROOT+'instances.jsonl', ALT_DATA_ROOT+'truth.jsonl', ALT_DATA_ROOT+'instances.jsonl')
+train_X = data_load.load_train_X()
+train_Y = data_load.load_train_Y()
 
 ''' Define Preprocessing Functions '''
 pos_list = ['CC', 'CD', 'DT', 'EX', 'FW', 'IN', 'JJ', 'JJR', 'JJS', 'LS', 'MD', 'NN', 'NNS', 'NNP', 'NNPS', 'PDT', 'POS', 'PRP', 'PRP$', 'RB', 'RBR', 'RBS', 'RP', 'SYM', 'TO', 'UH', 'VB', 'VBD', 'VBG', 'VBN', 'VBP', 'VBZ', 'WDT', 'WP', 'WP$', 'WRB']
@@ -205,12 +215,12 @@ def build_rec(row):
     return data
 
 p = Pool(POOL_THREADS)
-X = p.map(preprocess, test_X)
+X = p.map(preprocess, train_X)
 p.close()
 p.join()
 
 print('\nWriting Results to File')
-output = open('test_feat_2.csv', 'wb')
+output = open('valid_X.csv', 'wb')
 map(lambda x: output.write(build_rec(x)), X)
 output.close()
 
