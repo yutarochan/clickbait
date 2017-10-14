@@ -105,7 +105,7 @@ class ScoreReport:
         for i in range(len(self.acc_list)):
             self.output_roc_csv(i+1, self.tpr_list[i], self.fpr_list[i])
             # plt.plot(self.fpr_list[i], self.tpr_list[i], lw=1, label='ROC Fold %d (area = %0.2f)' % (i+1, self.auc_score[i]))
-        
+
         # Plot Random AUC Line
         # plt.plot([0, 1], [0, 1], '--', color=(0.6, 0.6, 0.6), label='Random')
 
@@ -137,6 +137,7 @@ class ScoreReport:
 
 # Unit Testing
 if __name__ == '__main__':
+    '''
     report = ScoreReport('Sample Model')
     y_pred = [1, 0, 1]
     y_true = [1, 0, 1]
@@ -155,3 +156,4 @@ if __name__ == '__main__':
 
     report.generate_rocplot()
     report.generate_score_report()
+    '''
