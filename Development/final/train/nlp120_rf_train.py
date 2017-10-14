@@ -22,13 +22,14 @@ warnings.filterwarnings("ignore")
 
 ''' Constants and Parameters '''
 DATA_ROOT = '../../../Data/dataset/'       # Root Folder of where Dataset Resides
+DATA_ROOT2 = '../../../Data/full_feat/'    # Root Folder of where Dataset Resides
 MODEL_ROOT = '../../../Models/'            # Root Folder of where Model Resides
 np.random.seed(9892)                       # Seed Parameter for PRNG
 
 ''' Import Data '''
 # Load Dataset
 data_load = JSONData(DATA_ROOT+'instances_train.jsonl', DATA_ROOT+'truth_train.jsonl', DATA_ROOT+'instances_test.jsonl')
-raw_data = csv.reader(open('../../../Data/final_feat/feat.csv', 'rb'), delimiter=',')
+raw_data = csv.reader(open('../../../Data/train_feat/feat.csv', 'rb'), delimiter=',')
 X = map(lambda x: map(lambda y: float(y), x), raw_data)
 train_Y = data_load.load_train_Y()
 
@@ -44,27 +45,28 @@ Y = np.array(map(lambda x: 0 if x['truthClass'] == 'no-clickbait' else 1, map(la
 
 ''' Train Full Model '''
 print('Training Full Model')
-# randforest = RandomForestClassifier(criterion='entropy')
-# randforest.fit(X, Y)
-
-gnb = GaussianNB()
-gnb.fit(X, Y)
+randforest = RandomForestClassifier(criterion='entropy')
+randforest.fit(X, Y)
 
 ''' Test Model - Generate Predictions '''
 # Format and Impute Errors from Preprocessing Phase
-data = pd.read_csv('../../../Data/validation/valid_X.csv', sep=',',header=None)
-data = data.replace([np.inf, -np.inf, np.nan], 0) # Replace missing or infinite values with zero.
-X_test = data.values
+data = pd.read_csv('../../../Data/full_feat/valid_X.csv', sep=',', header=None)
+# data = data.replace([np.inf, -np.inf, np.nan], 0) # Replace missing or infinite values with zero.
+idx_list = data.iloc[:, [0]].values.tolist()
+X_test = data.iloc[:, [1:]]
 
-ALT_DATA_ROOT = '/tmp/clickbait/Data/clickbait17-train-170331/'
-data_load = JSONData(ALT_DATA_ROOT+'instances.jsonl', ALT_DATA_ROOT+'truth.jsonl', ALT_DATA_ROOT+'instances.jsonl')
+'''
+ALT_DATA_ROOT = '../../../Data/full_feat/'
+data_load = JSONData(ALT_DATA_ROOT+'instances.jsonl', ALT_DATA_ROOT+'truth.jsonl', DATA_ROOT2+'instances.jsonl')
 # train_X = data_load.load_train_X()
 Y_test = data_load.load_train_Y()
+Y_idx = [i['id'] for i in Y_test]
 
 Y_test = np.array(map(lambda x: [0] if x['truthClass'] == 'no-clickbait' else [1], Y_test))
 
-Y_pred = map(lambda x: gnb.predict([x[1:]])[0], X_test)
+Y_pred = map(lambda x: randforest.predict([x[1:]])[0], X_test)
 print(Y_pred[0])
 
 from sklearn.metrics import classification_report
 print(classification_report(Y_test, Y_pred, labels=[0, 1]))
+'''
