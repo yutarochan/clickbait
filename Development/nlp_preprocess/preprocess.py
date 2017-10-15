@@ -1,4 +1,4 @@
-y'''
+'''
 Feature Extraction Script
 Script used to perform the preprocessing externally.
 
@@ -32,7 +32,7 @@ sys.setdefaultencoding('utf8')
 DATA_ROOT = '../../Data/dataset/'       # Root Folder of where Dataset Resides
 MODEL_ROOT = '../../Models/dataset/'    # Root Folder of where Model Resides
 
-ALT_DATA_ROOT = '/tmp/clickbait/Data/clickbait17-train-170331/'
+# ALT_DATA_ROOT = '/tmp/clickbait/Data/clickbait17-train-170331/'
 
 POOL_THREADS = 256
 
@@ -49,7 +49,7 @@ test_X = data_load.load_test()
 
 ''' Micro-Validation Dataset '''
 ALT_DATA_ROOT = '/tmp/clickbait/Data/clickbait17-train-170331/'
-data_load = JSONData(ALT_DATA_ROOT+'instances.jsonl', ALT_DATA_ROOT+'truth.jsonl', ALT_DATA_ROOT+'instances.jsonl')
+data_load = JSONData(DATA_ROOT+'instances_train.jsonl', DATA_ROOT+'truth_train.jsonl', DATA_ROOT+'instances_test.jsonl')
 train_X = data_load.load_train_X()
 train_Y = data_load.load_train_Y()
 
@@ -138,14 +138,14 @@ def preprocess(x):
             fvec.append(ts.smog_index(' '.join(x['targetParagraphs'])))
             fvec.append(ts.syllable_count(' '.join(x['targetParagraphs'])))
             fvec.append(mean_wordlen(x['targetParagraphs']))
-            fvec += ratio(x['targetParagraphs'])
-            fvec += ngram_feat(x['targetParagraphs'])
+            fvec += ratio(x['targetParagraphs']) #36
+            fvec += ngram_feat(x['targetParagraphs']) # 6
         else:
             fvec += [0]*61
         if len(word_tokenize(' '.join(x['postText']))) > 0:
             fvec.append(max_wordlen(x['postText']))
             fvec.append(sw_ratio(' '.join(x['postText'])))
-            fvec += ngram_feat(x['postText'])
+            fvec += ngram_feat(x['postText']) #6
         else:
             fvec += [0]*8
         fvec.append(len(word_tokenize(x['targetTitle'])))
@@ -195,7 +195,7 @@ def preprocess(x):
         fvec.append(pos_3gram(x['targetTitle'], 'NNP', 'NN', 'NN'))
         fvec.append(pos_2gram(x['targetTitle'], 'DT', 'NN'))
         fvec.append(ex_exist(x['targetTitle']))
-        fvec += ngram_feat(x['targetTitle'])
+        fvec += ngram_feat(x['targetTitle']) #6
     except Exception as e:
         print('EXCEPTION AT ID ' + str(x['id']))
         print(e)
@@ -214,6 +214,9 @@ def build_rec(row):
     data += '\n'
     return data
 
+print(len(preprocess(train_X[0])))
+
+'''
 p = Pool(POOL_THREADS)
 X = p.map(preprocess, train_X)
 p.close()
@@ -225,3 +228,4 @@ map(lambda x: output.write(build_rec(x)), X)
 output.close()
 
 print('\nDONE!')
+'''
